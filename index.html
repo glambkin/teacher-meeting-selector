@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3rd Year Parent Teacher Meeting Selector</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 30px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            padding: 12px 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.3s;
+        }
+        .search-box:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        .selected-count {
+            background: #10b981;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        .location-filter {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        .teachers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .teacher-card {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+        .teacher-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .teacher-card.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+        .teacher-card.hidden {
+            display: none;
+        }
+        .teacher-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+        .teacher-subject {
+            color: #667eea;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        .teacher-location {
+            color: #888;
+            font-size: 13px;
+            display: inline-block;
+            background: #f5f5f5;
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.show {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-header h2 {
+            color: #333;
+            font-size: 24px;
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #999;
+        }
+        .close-btn:hover {
+            color: #333;
+        }
+        .share-link-box {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 13px;
+        }
+        .copy-btn {
+            width: 100%;
+            padding: 12px;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+        }
+        .copy-btn:hover {
+            background: #0ea575;
+        }
+        .selected-list {
+            list-style: none;
+        }
+        .selected-list li {
+            padding: 10px;
+            background: #f9f9f9;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            border-left: 3px solid #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 3rd Year Parent Teacher Meeting</h1>
+        <p class="subtitle">Select the teachers you'd like to meet and share your selections</p>
+        
+        <div class="controls">
+            <input type="text" class="search-box" id="searchBox" placeholder="Search by teacher name or subject...">
+            <button class="btn btn-secondary" onclick="clearAll()">Clear All</button>
+            <button class="btn btn-primary" onclick="shareSelection()">Share Selection</button>
+            <div class="selected-count" id="selectedCount">0 selected</div>
+        </div>
+        
+        <div class="location-filter" id="locationFilter"></div>
+        
+        <div class="teachers-grid" id="teachersGrid"></div>
+    </div>
+    
+    <div class="modal" id="shareModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Share Your Selection</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <p style="margin-bottom: 15px; color: #666;">Copy this link to share your selected teachers:</p>
+            <div class="share-link-box" id="shareLink"></div>
+            <button class="copy-btn" onclick="copyLink()">📋 Copy Link</button>
+            <h3 style="margin: 25px 0 15px 0; color: #333;">Selected Teachers:</h3>
+            <ul class="selected-list" id="selectedList"></ul>
+        </div>
+    </div>
+    
+    <script>
+        const teachers = [
+{name:'Beadle-Cassidy, J.',subject:'Geography',location:'Canteen Hall'},
+{name:'Brady, C.',subject:'Science',location:'Canteen Hall'},
+{name:'Brennan, E.',subject:'Geography x2',location:'Canteen Hall'},
+{name:'Byrne, T.',subject:'Science x2',location:'Canteen Hall'},
+{name:'Clarke, S.',subject:'Spanish',location:'Canteen Hall'},
+{name:'Cosgrove, E.',subject:'History x2',location:'Canteen Hall'},
+{name:'Cregg, A.',subject:'Business x2',location:'Canteen Hall'},
+{name:'Daly, L.',subject:'English',location:'Canteen Hall'},
+{name:'Delap, A.',subject:'Irish',location:'Canteen Hall'},
+{name:'Donnelly, D.',subject:'Business x2',location:'Canteen Hall'},
+{name:'Dowling, M.',subject:'Art',location:'Canteen Hall'},
+{name:'Downey, S.',subject:'History',location:'Canteen Hall'},
+{name:'Fagan, E.',subject:'Spanish Irish',location:'Room 5.1'},
+{name:'Fahey, S.',subject:'German',location:'Room 5.1'},
+{name:'Fitzpatrick, C.',subject:'Tech. Graphics',location:'Room 5.1'},
+{name:'Flynn, B.',subject:'Maths Computers',location:'Room 5.1'},
+{name:'Hanley, C.',subject:'Science',location:'Room 5.1'},
+{name:'Haugh, M.',subject:'Irish',location:'Room 5.2'},
+{name:'Healy, S.',subject:'Irish GCSE P.E.',location:'Room 5.2'},
+{name:'Hogan, E.',subject:'French',location:'Room 5.2'},
+{name:'Howlin, E.',subject:'Maths',location:'Room 5.2'},
+{name:'Jones, N.',subject:'English Classics',location:'Room 5.2'},
+{name:'Melvin, S.',subject:'Yearhead',location:'Library'},
+{name:'Haughey, A.',subject:'Yearhead History English',location:'Library'},
+{name:'OCarroll, R.',subject:'History x2',location:'Mr. Haughey Library'},
+{name:'McKinney, R.',subject:'English',location:'Mr. Haughey Library'},
+{name:'Kavanagh, E.',subject:'Woodwork',location:'Library'},
+{name:'Kavanagh, T.',subject:'Irish Geography',location:'Library'},
+{name:'Kelly, H.',subject:'English',location:'Library'},
+{name:'Kerins, J.',subject:'Geography',location:'Library'},
+{name:'Kinahan, N.',subject:'Geography',location:'Library'},
+{name:'Lloyd, S.',subject:'Maths',location:'Library'},
+{name:'Lowe, N.',subject:'Science',location:'Library'},
+{name:'Lunn, S.',subject:'Spanish',location:'Library'},
+{name:'Lyons, A.M.',subject:'English History',location:'Library'},
+{name:'Maher, N.',subject:'Spanish Music',location:'Music Room'},
+{name:'Maxwell, C.',subject:'Science',location:'Music Room'},
+{name:'McAllen, M.',subject:'Science x2',location:'Music Room'},
+{name:'McMahon, C.',subject:'Maths',location:'Music Room'},
+{name:'Mulligan, S.',subject:'Maths',location:'Music Room'},
+{name:'Murray, C.',subject:'Business',location:'Room 4.1'},
+{name:'ONeill, S.',subject:'Maths',location:'Room 4.1'},
+{name:'OSullivan, G.',subject:'Woodwork',location:'Room 4.1'},
+{name:'Purcell, C.',subject:'Business',location:'Room 4.4'},
+{name:'Reid, É.',subject:'Music',location:'Room 4.4'},
+{name:'Scanlan, M.',subject:'Irish',location:'Room 4.4'},
+{name:'Slattery, L.',subject:'English',location:'Room 4.4'},
+{name:'Murphy, A.',subject:'AEN Coordinator French',location:'Room 5.3'},
+{name:'Mulvihill, R.',subject:'Guidance Counsellor',location:'Room 5.3'}
+];
+
+let selectedTeachers = new Set();
+let currentFilter = 'all';
+
+function init() {
+    loadFromURL();
+    renderTeachers();
+    setupLocationFilters();
+    setupSearch();
+    updateCount();
+}
+
+function loadFromURL() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const selected = urlParams.get('selected');
+    if (selected) {
+        selectedTeachers = new Set(selected.split(',').map(id => parseInt(id)));
+    }
+}
+
+function setupLocationFilters() {
+    const locations = ['all', ...new Set(teachers.map(t => t.location))];
+    const filterDiv = document.getElementById('locationFilter');
+    locations.forEach(loc => {
+        const btn = document.createElement('button');
+        btn.className = 'filter-btn' + (loc === 'all' ? ' active' : '');
+        btn.textContent = loc === 'all' ? 'All Locations' : loc;
+        btn.onclick = () => filterByLocation(loc, btn);
+        filterDiv.appendChild(btn);
+    });
+}
+
+function filterByLocation(location, btn) {
+    currentFilter = location;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderTeachers();
+}
+
+function setupSearch() {
+    document.getElementById('searchBox').addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase();
+        renderTeachers(query);
+    });
+}
+
+function renderTeachers(searchQuery = '') {
+    const grid = document.getElementById('teachersGrid');
+    grid.innerHTML = '';
+    teachers.forEach((teacher, idx) => {
+        const matchesFilter = currentFilter === 'all' || teacher.location === currentFilter;
+        const matchesSearch = !searchQuery || 
+            teacher.name.toLowerCase().includes(searchQuery) || 
+            teacher.subject.toLowerCase().includes(searchQuery);
+        
+        if (matchesFilter && matchesSearch) {
+            const card = document.createElement('div');
+            card.className = 'teacher-card' + (selectedTeachers.has(idx) ? ' selected' : '');
+            card.onclick = () => toggleTeacher(idx);
+            card.innerHTML = `
+                <div class="teacher-name">${teacher.name}</div>
+                <div class="teacher-subject">${teacher.subject}</div>
+                <div class="teacher-location">📍 ${teacher.location}</div>
+            `;
+            grid.appendChild(card);
+        }
+    });
+}
+
+function toggleTeacher(idx) {
+    if (selectedTeachers.has(idx)) {
+        selectedTeachers.delete(idx);
+    } else {
+        selectedTeachers.add(idx);
+    }
+    renderTeachers();
+    updateCount();
+}
+
+function updateCount() {
+    document.getElementById('selectedCount').textContent = `${selectedTeachers.size} selected`;
+}
+
+function clearAll() {
+    selectedTeachers.clear();
+    renderTeachers();
+    updateCount();
+}
+
+function shareSelection() {
+    if (selectedTeachers.size === 0) {
+        alert('Please select at least one teacher before sharing.');
+        return;
+    }
+    const selectedIds = Array.from(selectedTeachers).join(',');
+    const shareUrl = `${window.location.origin}${window.location.pathname}?selected=${selectedIds}`;
+    document.getElementById('shareLink').textContent = shareUrl;
+    
+    const list = document.getElementById('selectedList');
+    list.innerHTML = '';
+    Array.from(selectedTeachers).sort().forEach(idx => {
+        const teacher = teachers[idx];
+        const li = document.createElement('li');
+        li.innerHTML = `<strong>${teacher.name}</strong> - ${teacher.subject}<br><small>📍 ${teacher.location}</small>`;
+        list.appendChild(li);
+    });
+    
+    document.getElementById('shareModal').classList.add('show');
+}
+
+function closeModal() {
+    document.getElementById('shareModal').classList.remove('show');
+}
+
+function copyLink() {
+    const linkText = document.getElementById('shareLink').textContent;
+    navigator.clipboard.writeText(linkText).then(() => {
+        const btn = event.target;
+        const originalText = btn.textContent;
+        btn.textContent = '✓ Copied!';
+        setTimeout(() => {
+            btn.textContent = originalText;
+        }, 2000);
+    });
+}
+
+init();
+    </script>
+</body>
+</html>
